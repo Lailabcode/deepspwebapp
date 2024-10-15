@@ -14,6 +14,9 @@ from flask import Flask, request, redirect, url_for, render_template, flash, sen
 import os
 from urllib.parse import quote as url_quote
 
+import csv
+
+from main import process_file
 
 app = Flask(__name__)
 
@@ -35,54 +38,54 @@ def home():
     #print("csv_path:", csv_path)  # This will print the value of csv_path to your console
     return render_template('index.html', csv_path=csv_path)
 
-# def write_to_csv(data, filename):
-#     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-#     with open(filepath, 'w', newline='') as csvfile:
-#         fieldnames = ['Name', 'Heavy_Chain', 'Light_Chain']
-#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-#         writer.writeheader()
-#         writer.writerow(data)
-#     return filepath
+def write_to_csv(data, filename):
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    with open(filepath, 'w', newline='') as csvfile:
+        fieldnames = ['Name', 'Heavy_Chain', 'Light_Chain']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow(data)
+    return filepath
 
 
 #@app.route('/upload', methods=['GET','POST'])
 
 @app.route('/upload', methods=['GET', 'POST'])
-# def upload_file():
-#     if request.method == 'POST':
-#         file = request.files.get('file')  # Using .get is safer for dict access
-#         if file and file.filename:
-#             if allowed_file(file.filename):
-#                 filename = url_quote(file.filename)  # Use secure_filename to avoid security issues
-#                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-#                 # If you need to do something with the file, add that logic here
+def upload_file():
+    if request.method == 'POST':
+        file = request.files.get('file')  # Using .get is safer for dict access
+        if file and file.filename:
+            if allowed_file(file.filename):
+                filename = url_quote(file.filename)  # Use secure_filename to avoid security issues
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                # If you need to do something with the file, add that logic here
 
-#         # Handle form data and write to CSV
-#         mab_data = {
-#             'Name': request.form.get('mab_name', ''),
-#             'Heavy_Chain': request.form.get('heavy_chain', ''),
-#             'Light_Chain': request.form.get('light_chain', '')
-#         }
-#         filepath = write_to_csv(mab_data, 'input_data.csv')
-#         #try:
-#         #    processed_csv_path = process_file(filepath)  # This function should handle file processing
-#         #    csv_filename = os.path.basename(processed_csv_path)
-#         #    return redirect(url_for('home', csv_path=csv_filename))
-#         #except Exception as e:
-#         #    flash(f'Error processing file: {e}')
-#         #    return redirect(request.url)  # Redirect to the same page to try again
-#         try:
-#             processed_csv_path = process_file(filepath)
-#             csv_data = []  
-#             with open(processed_csv_path, 'r', newline='') as csvfile:
-#                 reader = csv.reader(csvfile)
-#                 for row in reader:
-#                     csv_data.append(row)
-#             return render_template('index.html', csv_path=os.path.basename(processed_csv_path), csv_data=csv_data)
-#         except Exception as e:
-#             flash(f'Error processing file: {e}')
-#             return redirect(request.url)
-#     return render_template('index.html')  # Ensure you have a GET handler to display the form
+        # Handle form data and write to CSV
+        mab_data = {
+            'Name': request.form.get('mab_name', ''),
+            'Heavy_Chain': request.form.get('heavy_chain', ''),
+            'Light_Chain': request.form.get('light_chain', '')
+        }
+        filepath = write_to_csv(mab_data, 'input_data.csv')
+        #try:
+        #    processed_csv_path = process_file(filepath)  # This function should handle file processing
+        #    csv_filename = os.path.basename(processed_csv_path)
+        #    return redirect(url_for('home', csv_path=csv_filename))
+        #except Exception as e:
+        #    flash(f'Error processing file: {e}')
+        #    return redirect(request.url)  # Redirect to the same page to try again
+        try:
+            processed_csv_path = process_file(filepath)
+            csv_data = []  
+            with open(processed_csv_path, 'r', newline='') as csvfile:
+                reader = csv.reader(csvfile)
+                for row in reader:
+                    csv_data.append(row)
+            return render_template('index.html', csv_path=os.path.basename(processed_csv_path), csv_data=csv_data)
+        except Exception as e:
+            flash(f'Error processing file: {e}')
+            return redirect(request.url)
+    return render_template('index.html')  # Ensure you have a GET handler to display the form
 
     
 @app.route('/download/<filename>', methods=['GET'])

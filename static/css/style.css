@@ -25,16 +25,6 @@ header {
     border-radius: 10px;   
     font-size: 1.2em
 }
-
-#update {
-    font-family: 'Impact', 'fantasy', sans-serif;
-    font-weight: bold;
-    margin: 20px;
-    padding: 0px;
-    border-radius: 10px;   
-    font-size: 1.2em
-}
-
 #deepSP .text-container {
     font-family: 'Impact', 'fantasy', sans-serif;
     background-color: #add8e6; /* Light blue color, adjust as needed */
